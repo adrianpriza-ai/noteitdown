@@ -17,6 +17,8 @@ A responsive, offline-first Markdown notes web application with live preview, au
 
 ### 1. Run the Application
 
+You can use the hosted version online at [https://adrianpriza-ai.github.io/noteitdown/](https://adrianpriza-ai.github.io/noteitdown/), or run it locally:
+
 Simply open `index.html` in any modern web browser:
 - Double-click the file, or
 - Run a local server: `python3 -m http.server 8080` and visit `http://localhost:8080`
