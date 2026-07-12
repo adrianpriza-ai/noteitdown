@@ -1,0 +1,36 @@
+{
+  "name": "noteitdown",
+  "version": "1.0.0",
+  "description": "MCP server to store and manage Markdown notes in your own Supabase project. No backend or developer-owned account required.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "noteitdown": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "pg": "^8.13.0",
+    "prompts": "^2.4.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "@types/pg": "^8.11.10",
+    "@types/prompts": "^2.4.9",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
