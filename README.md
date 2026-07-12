@@ -12,6 +12,7 @@ A responsive, offline-first Markdown notes web application with live preview, au
 - 🎨 **Formatting Toolbar**: Quick access to common Markdown formatting
 - 🔒 **No Backend Required**: Uses Supabase as a backend-as-a-service
 - 📝 **CRUD Operations**: Create, read, update, delete notes
+- 🤖 **AI Chat with Tool Calling**: Chat with an AI that can read and edit your notes via tool calls (write, append, replace) using any OpenAI-compatible API
 
 ## Getting Started
 
@@ -85,6 +86,18 @@ create trigger noteitdown_updated_at
   for each row execute function public.noteitdown_set_updated_at();
 ```
 
+
+### 3. Optional AI Chat Setup
+
+To enable the AI chat with note editing:
+
+1. Open Settings → AI Chat
+2. Toggle **Enable AI Chat** on
+3. Enter your OpenAI-compatible API endpoint and API key
+4. Click **Refresh Models** to load available models
+5. Select your preferred model
+
+The AI has access to tools that let it **write**, **append**, and **replace** content in your current note directly.
 
 ## How It Works
 
