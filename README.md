@@ -1,6 +1,20 @@
+<div align="center">
+
 # Note It Down
 
 A responsive, offline-first Markdown notes web application with live preview, autosave, and optional Supabase synchronization.
+
+<img src="https://adrianpriza-ai.github.io/note1.png" width="800" alt="Screenshot 1">
+
+</div>
+
+<details close>
+  <summary><b>📸 More Screenshots</b></summary>
+  <br>
+  <img src="https://adrianpriza-ai.github.io/note2.png" width="800" alt="Screenshot 2">
+  <br>
+  <img src="https://adrianpriza-ai.github.io/note3.png" width="800" alt="Screenshot 3">
+</details>
 
 ## Features
 

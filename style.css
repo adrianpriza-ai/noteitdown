@@ -8,13 +8,13 @@
     --danger: #dc3545;
     --warning: #ffc107;
     --info: #17a2b8;
-    --light: #f8f9fa;
+    --light: #e9ecef;
     --dark: #212529;
     --border: #dee2e6;
     --border-light: #e9ecef;
-    --white: #ffffff;
-    --bg-light: #f5f7fa;
-    --bg-main: #ffffff;
+    --white: #fdfdfd;
+    --bg-light: #e0e2e6;
+    --bg-main: #f0f2f5;
     --shadow: 0 2px 8px rgba(0,0,0,0.08);
     --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
     --radius: 8px;
@@ -41,8 +41,8 @@
 /* Dark Theme - Pure Black */
 [data-theme="dark"] {
     --primary: #f97316;
-    --primary-hover: #fb923c;
-    --primary-light: #431407;
+    --primary-hover: #ea580c;
+    --primary-light: #fff7ed;
     --secondary: #9ca3af;
     --light: #171717;
     --dark: #f3f4f6;
@@ -223,12 +223,12 @@ body {
     align-items: center;
     justify-content: center;
     transition: all var(--transition);
-    color: var(--text-secondary);
+    color: var(--primary);
 }
 
 .btn-icon:hover {
     background: var(--light);
-    color: var(--text-primary);
+    color: var(--primary-hover);
 }
 
 .btn-icon svg {
@@ -945,7 +945,7 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--primary);
     width: 32px;
     height: 32px;
     display: flex;
@@ -957,7 +957,7 @@ body {
 
 .close-btn:hover {
     background: var(--light);
-    color: var(--text-primary);
+    color: var(--primary-hover);
 }
 
 .close-btn svg {

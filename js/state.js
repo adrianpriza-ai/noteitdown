@@ -1,0 +1,63 @@
+// DOM Elements
+const elements = {
+    app: document.getElementById('app'),
+    editor: document.getElementById('editor'),
+    preview: document.getElementById('preview'),
+    previewSection: document.querySelector('.preview-section'),
+    notesList: document.getElementById('notesList'),
+    status: document.getElementById('status'),
+    syncStatus: document.getElementById('syncStatus'),
+    lastSaved: document.getElementById('lastSaved'),
+    charCount: document.getElementById('charCount'),
+    noteCount: document.getElementById('noteCount'),
+    searchInput: document.getElementById('searchInput'),
+    newNoteBtn: document.getElementById('newNoteBtn'),
+    darkModeBtn: document.getElementById('darkModeBtn'),
+    sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
+    settingsBtn: document.getElementById('settingsBtn'),
+    sidebar: document.getElementById('sidebar'),
+    settingsModal: document.getElementById('settingsModal'),
+    closeModalBtn: document.getElementById('closeModalBtn'),
+    supabaseUrl: document.getElementById('supabaseUrl'),
+    anonKey: document.getElementById('anonKey'),
+    testBtn: document.getElementById('testBtn'),
+    clearSyncBtn: document.getElementById('clearSyncBtn'),
+    cancelBtn: document.getElementById('cancelBtn'),
+    saveBtn: document.getElementById('saveBtn'),
+    darkModeToggle: document.getElementById('darkModeToggle'),
+    copyPreviewBtn: document.getElementById('copyPreviewBtn'),
+    rawToggleBtn: document.getElementById('rawToggleBtn'),
+    aiChatToggleBtn: document.getElementById('aiChatToggleBtn'),
+    aiChatPanel: document.getElementById('aiChatPanel'),
+    aiChatMessages: document.getElementById('aiChatMessages'),
+    aiChatInput: document.getElementById('aiChatInput'),
+    aiSendBtn: document.getElementById('aiSendBtn'),
+    closeAiChatBtn: document.getElementById('closeAiChatBtn'),
+    aiEnableToggle: document.getElementById('aiEnableToggle'),
+    aiEndpoint: document.getElementById('aiEndpoint'),
+    aiApiKey: document.getElementById('aiApiKey'),
+    aiModelSelect: document.getElementById('aiModelSelect'),
+    fetchModelsBtn: document.getElementById('fetchModelsBtn'),
+    aiConfigSection: document.getElementById('aiConfigSection'),
+    aiConfigMessage: document.getElementById('aiConfigMessage'),
+    connectionMessage: document.getElementById('connectionMessage'),
+    toolbarBtns: document.querySelectorAll('.toolbar-btn')
+};
+
+// App State
+let state = {
+    notes: {},
+    activeNoteId: null,
+    supabaseClient: null,
+    isSyncEnabled: false,
+    isDarkMode: false,
+    isRawMode: false,
+    isAiEnabled: false,
+    isAiChatOpen: false,
+    searchQuery: '',
+    history: [],
+    historyIndex: -1,
+    maxHistory: 50
+};
+
+let saveTimeout = null;
