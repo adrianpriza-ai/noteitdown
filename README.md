@@ -1,4 +1,4 @@
-# Markdown Notes App
+# Note It Down
 
 A responsive, offline-first Markdown notes web application with live preview, autosave, and optional Supabase synchronization.
 
