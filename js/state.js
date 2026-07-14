@@ -22,7 +22,6 @@ const elements = {
     anonKey: document.getElementById('anonKey'),
     testBtn: document.getElementById('testBtn'),
     clearSyncBtn: document.getElementById('clearSyncBtn'),
-    cancelBtn: document.getElementById('cancelBtn'),
     saveBtn: document.getElementById('saveBtn'),
     darkModeToggle: document.getElementById('darkModeToggle'),
     copyPreviewBtn: document.getElementById('copyPreviewBtn'),

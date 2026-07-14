@@ -77,7 +77,6 @@ function setupEventListeners() {
     elements.sidebarToggleBtn.addEventListener('click', toggleSidebar);
     elements.settingsBtn.addEventListener('click', openSettings);
     elements.closeModalBtn.addEventListener('click', closeSettings);
-    elements.cancelBtn.addEventListener('click', closeSettings);
     elements.saveBtn.addEventListener('click', saveSettings);
     elements.testBtn.addEventListener('click', testConnection);
     elements.clearSyncBtn.addEventListener('click', clearSync);
@@ -140,4 +139,87 @@ function fetchLatestVersion() {
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
+    initMobileNav();
 });
+
+// ─── Mobile Navigation ───────────────────────────────────────────────────────
+
+const MOBILE_BREAKPOINT = 640;
+
+function isMobile() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
+let currentMobilePanel = 'notes';
+
+function initMobileNav() {
+    // Always register listeners — CSS hides the nav on desktop.
+    // Do NOT bail early here based on isMobile(); that would mean
+    // buttons silently have no handlers if page loads wide then is resized.
+
+    // Bottom nav tab buttons
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activateMobilePanel(btn.dataset.target);
+        });
+    });
+
+    // FAB → create new note and switch to Editor
+    const fab = document.getElementById('mobileFabBtn');
+    if (fab) {
+        fab.addEventListener('click', () => {
+            createNewNote();
+            activateMobilePanel('editor');
+        });
+    }
+
+    // Set initial panel state if we are already on mobile at load time
+    if (isMobile()) {
+        activateMobilePanel('notes');
+    }
+
+    // Re-evaluate on orientation / resize
+    window.addEventListener('resize', () => {
+        if (isMobile()) {
+            activateMobilePanel(currentMobilePanel);
+        }
+    });
+}
+
+function activateMobilePanel(panelName) {
+    currentMobilePanel = panelName;
+
+    const sidebar      = document.getElementById('sidebar');
+    const editorSec    = document.querySelector('.editor-section');
+    const previewSec   = document.querySelector('.preview-section');
+    const fab          = document.getElementById('mobileFabBtn');
+
+    // Remove active from all panels
+    [sidebar, editorSec, previewSec].forEach(el => {
+        if (el) el.classList.remove('mobile-active');
+    });
+
+    // Show the chosen panel
+    const targets = { notes: sidebar, editor: editorSec, preview: previewSec };
+    const target = targets[panelName];
+    if (target) target.classList.add('mobile-active');
+
+    // Sync bottom nav indicator
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.target === panelName);
+    });
+
+    // FAB only visible on Notes panel
+    if (fab) {
+        fab.classList.toggle('hidden-fab', panelName !== 'notes');
+    }
+}
+
+/**
+ * Called by notes.js when user taps a note — auto-navigates to Editor on mobile.
+ */
+function mobileGoToEditor() {
+    if (isMobile()) {
+        activateMobilePanel('editor');
+    }
+}

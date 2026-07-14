@@ -96,6 +96,9 @@ function selectNote(id) {
     saveState();
     renderNotesList();
     loadActiveNote();
+
+    // On mobile: automatically switch to editor after selecting a note
+    if (typeof mobileGoToEditor === 'function') mobileGoToEditor();
 }
 
 function loadActiveNote() {
