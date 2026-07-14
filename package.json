@@ -2,6 +2,23 @@
   "name": "noteitdown",
   "version": "1.0.0",
   "description": "MCP server to store and manage Markdown notes in your own Supabase project. No backend or developer-owned account required.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "supabase",
+    "notes",
+    "markdown",
+    "ai",
+    "tool-calling"
+  ],
+  "homepage": "https://github.com/yourusername/noteitdown#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/noteitdown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/noteitdown/issues"
+  },
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -14,7 +31,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepublishOnly": "npm run build && npm run typecheck"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

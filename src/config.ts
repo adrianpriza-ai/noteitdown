@@ -25,8 +25,12 @@ export function loadConfig(): NoteitdownConfig | null {
 
   if (!existsSync(CONFIG_PATH)) {
     if (envUrl || envKey) {
+      const missing: string[] = [];
+      if (!envUrl) missing.push("SUPABASE_URL");
+      if (!envKey) missing.push("SUPABASE_KEY");
       throw new Error(
-        "Both SUPABASE_URL and SUPABASE_KEY must be set together via environment variables."
+        `Missing environment variable${missing.length > 1 ? "s" : ""}: ${missing.join(", ")}. ` +
+        `Both SUPABASE_URL and SUPABASE_KEY must be set together.`
       );
     }
     return null;
