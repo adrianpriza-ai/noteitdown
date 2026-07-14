@@ -15,6 +15,7 @@ function init() {
     loadActiveNote();
     updateCharCount();
     setupEventListeners();
+    fetchLatestVersion();
 
     updateStatus('Ready', 'info');
 }
@@ -117,6 +118,24 @@ function setupEventListeners() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', handleGlobalKeydown);
+}
+
+function fetchLatestVersion() {
+    fetch('https://api.github.com/repos/adrianpriza-ai/noteitdown/tags')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                const latestTag = data[0].name;
+                const versionEl = document.getElementById('appVersion');
+                if (versionEl) {
+                    versionEl.textContent = latestTag;
+                }
+            }
+        })
+        .catch(err => console.error('Error fetching latest version:', err));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
