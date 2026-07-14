@@ -31,6 +31,49 @@ A responsive, offline-first Markdown notes web application with live preview, au
 
 ---
 
+## 🖥️ Web Application
+
+### Getting Started
+
+#### 1. Run the Application
+
+You can use the hosted version online at [https://adrianpriza-ai.github.io/noteitdown/](https://adrianpriza-ai.github.io/noteitdown/), or run it locally:
+
+Simply open `index.html` in any modern web browser:
+- Double-click the file, or
+- Run a local server: `python3 -m http.server 8080` and visit `http://localhost:8080`
+
+#### 2. Optional Supabase Setup
+
+To enable cloud synchronization:
+
+1. Create a free project at [supabase.com](https://supabase.com)
+2. Get your Project URL and anon key from Settings → API
+3. Create the notes table (use the MCP setup command or the SQL above)
+4. Click the ⚙️ Settings button in the app and enter your URL and key
+
+#### 3. Optional AI Chat Setup
+
+To enable the AI chat with note editing:
+
+1. Open Settings → AI Chat
+2. Toggle **Enable AI Chat** on
+3. Enter your OpenAI-compatible API endpoint and API key
+4. Click **Refresh Models** to load available models
+5. Select your preferred model
+
+The AI has access to tools that let it **write**, **append**, and **replace** content in your current note directly.
+
+### How It Works
+
+1. **Offline First**: Notes are immediately saved to browser's localStorage
+2. **Live Preview**: Markdown is rendered in real-time using [marked.js](https://marked.js.org)
+3. **Autosave**: Changes are saved after a 1-second delay (debounced)
+4. **Shared Supabase Table**: When configured, notes are synchronized to the *same* `notes` table the MCP server uses — both ways. On startup the app pulls notes from Supabase (so notes created via MCP appear here), and on every edit it pushes changes back.
+5. **Conflict Resolution**: Uses last-write-wins strategy based on `updated_at` timestamps
+
+---
+
 ## 📦 MCP Server
 
 Note It Down includes a **full MCP server** that lets AI assistants (Claude, etc.) read, create, update, search, and delete notes in your Supabase project.
@@ -229,49 +272,6 @@ create trigger noteitdown_updated_at
 ```
 
 </details>
-
----
-
-## 🖥️ Web Application
-
-### Getting Started
-
-#### 1. Run the Application
-
-You can use the hosted version online at [https://adrianpriza-ai.github.io/noteitdown/](https://adrianpriza-ai.github.io/noteitdown/), or run it locally:
-
-Simply open `index.html` in any modern web browser:
-- Double-click the file, or
-- Run a local server: `python3 -m http.server 8080` and visit `http://localhost:8080`
-
-#### 2. Optional Supabase Setup
-
-To enable cloud synchronization:
-
-1. Create a free project at [supabase.com](https://supabase.com)
-2. Get your Project URL and anon key from Settings → API
-3. Create the notes table (use the MCP setup command or the SQL above)
-4. Click the ⚙️ Settings button in the app and enter your URL and key
-
-#### 3. Optional AI Chat Setup
-
-To enable the AI chat with note editing:
-
-1. Open Settings → AI Chat
-2. Toggle **Enable AI Chat** on
-3. Enter your OpenAI-compatible API endpoint and API key
-4. Click **Refresh Models** to load available models
-5. Select your preferred model
-
-The AI has access to tools that let it **write**, **append**, and **replace** content in your current note directly.
-
-### How It Works
-
-1. **Offline First**: Notes are immediately saved to browser's localStorage
-2. **Live Preview**: Markdown is rendered in real-time using [marked.js](https://marked.js.org)
-3. **Autosave**: Changes are saved after a 1-second delay (debounced)
-4. **Shared Supabase Table**: When configured, notes are synchronized to the *same* `notes` table the MCP server uses — both ways. On startup the app pulls notes from Supabase (so notes created via MCP appear here), and on every edit it pushes changes back.
-5. **Conflict Resolution**: Uses last-write-wins strategy based on `updated_at` timestamps
 
 ---
 
