@@ -11,13 +11,13 @@
     "ai",
     "tool-calling"
   ],
-  "homepage": "https://github.com/yourusername/noteitdown#readme",
+  "homepage": "https://github.com/adrianpriza-ai/noteitdown#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/noteitdown.git"
+    "url": "git+https://github.com/adrianpriza-ai/noteitdown.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/noteitdown/issues"
+    "url": "https://github.com/adrianpriza-ai/noteitdown/issues"
   },
   "license": "MIT",
   "type": "module",
