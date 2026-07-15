@@ -10,12 +10,16 @@
  */
 export const DEBUG = process.env.NOTEITDOWN_DEBUG === "true";
 
+function getTimestamp(): string {
+  return new Date().toISOString();
+}
+
 export function debug(...args: unknown[]): void {
   if (DEBUG) {
-    console.error("[noteitdown:debug]", ...args);
+    console.error(`[${getTimestamp()}] [noteitdown:debug]`, ...args);
   }
 }
 
 export function log(...args: unknown[]): void {
-  console.error("[noteitdown]", ...args);
+  console.error(`[${getTimestamp()}] [noteitdown]`, ...args);
 }

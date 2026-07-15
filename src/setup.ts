@@ -49,8 +49,13 @@ export async function runSetup(): Promise<void> {
         type: "password",
         name: "supabaseKey",
         message: "Supabase Anon Key:",
-        validate: (v: string) =>
-          v.trim().length > 0 || "Anon key is required.",
+        validate: (v: string) => {
+          const trimmed = v.trim();
+          if (!trimmed) return "Anon key is required.";
+          if (trimmed.length < 30) return "Anon key seems too short (expected ~100+ characters).";
+          if (!trimmed.includes('.')) return "Anon key should contain a dot separator.";
+          return true;
+        },
       },
       {
         type: "password",

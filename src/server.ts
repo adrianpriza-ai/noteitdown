@@ -6,6 +6,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getClient } from "./client.js";
 import { debug, log } from "./logger.js";
+import { rateLimiter } from "./rateLimiter.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -138,6 +139,7 @@ export async function startServer(): Promise<void> {
         .describe("Number of notes to skip."),
     },
     async ({ limit, offset }) => {
+      rateLimiter.check("global");
       debug("Listing notes:", { limit, offset });
       const { notes, count } = await withClient(async (client) => {
         const { data, error, count } = await client
@@ -167,6 +169,7 @@ export async function startServer(): Promise<void> {
       id: z.string().describe("The UUID of the note to retrieve."),
     },
     async ({ id }) => {
+      rateLimiter.check("global");
       debug("Getting note:", id);
       const note = await withClient(async (client) => {
         const { data, error } = await client
@@ -195,6 +198,7 @@ export async function startServer(): Promise<void> {
         .describe("Optional list of tags for categorizing the note."),
     },
     async ({ title, content, tags }) => {
+      rateLimiter.check("global");
       debug("Creating note:", { title, tags });
       const note = await withClient(async (client) => {
         const { data, error } = await client
@@ -228,6 +232,7 @@ export async function startServer(): Promise<void> {
         .describe("New list of tags (replaces existing tags)."),
     },
     async ({ id, title, content, tags }) => {
+      rateLimiter.check("global");
       const patch: Record<string, unknown> = {};
       if (title !== undefined) patch.title = title;
       if (content !== undefined) patch.content = content;
@@ -267,6 +272,7 @@ export async function startServer(): Promise<void> {
       id: z.string().describe("The UUID of the note to delete."),
     },
     async ({ id }) => {
+      rateLimiter.check("global");
       debug("Deleting note:", id);
       await withClient(async (client) => {
         const { error } = await client.from("notes").delete().eq("id", id);
@@ -287,6 +293,7 @@ export async function startServer(): Promise<void> {
       query: z.string().describe("The search term to look for in note titles and content."),
     },
     async ({ query }) => {
+      rateLimiter.check("global");
       debug("Searching notes:", query);
       const notes = await withClient(async (client) => {
         const { data, error } = await client
@@ -310,6 +317,7 @@ export async function startServer(): Promise<void> {
     "Verify the noteitdown MCP server is running and connected to Supabase. Returns a status message indicating whether the server is healthy.",
     {},
     async () => {
+      rateLimiter.check("global");
       debug("Health check requested");
       try {
         await withClient(async (client) => {
@@ -320,7 +328,7 @@ export async function startServer(): Promise<void> {
           content: [
             {
               type: "text",
-              text: "✅ noteitdown MCP server is healthy and connected to Supabase.",
+              text: `✅ noteitdown MCP server v${version} is healthy and connected to Supabase.`,
             },
           ],
         };
@@ -342,6 +350,7 @@ export async function startServer(): Promise<void> {
         .describe("Array of note UUIDs to delete."),
     },
     async ({ ids }) => {
+      rateLimiter.check("global");
       debug("Batch deleting notes:", ids.length);
       await withClient(async (client) => {
         const { error } = await client

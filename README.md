@@ -28,6 +28,8 @@ A responsive, offline-first Markdown notes web application with live preview, au
 - 📝 **CRUD Operations**: Create, read, update, delete notes
 - 🤖 **AI Chat with Tool Calling**: Chat with an AI that can read and edit your notes via tool calls (write, append, replace) using any OpenAI-compatible API
 - 🧩 **MCP Server**: Exposes notes as resources and tools to AI assistants via the Model Context Protocol
+- 🛡️ **Rate Limiting**: Built-in rate limiter (100 req/min) to prevent abuse
+- 🔍 **Timestamps in Logs**: All log messages include ISO 8601 timestamps for easier debugging
 
 ---
 
@@ -97,13 +99,13 @@ noteitdown
 |----------|-------------|
 | `SUPABASE_URL` | Override the saved Supabase Project URL |
 | `SUPABASE_KEY` | Override the saved Supabase Anon Key |
-| `NOTEITDOWN_DEBUG` | Set to `true` to enable debug logging |
+| `NOTEITDOWN_DEBUG` | Set to `true` to enable debug output with timestamps |
 
 > **Tip:** Environment variables override the saved config file at `~/.noteitdown/config.json`.
 
 ### Tools
 
-The server exposes **9 tools** for note management:
+The server exposes **8 tools** for note management, protected by a built-in rate limiter (100 requests per 60-second window):
 
 #### `list_notes`
 List notes sorted by most recently updated, with **pagination support**.
@@ -178,7 +180,7 @@ Returns matching notes sorted by last updated.
 #### `health_check`
 Verify the server is running and connected to Supabase. Takes no parameters.
 
-Returns a status message like `✅ noteitdown MCP server is healthy and connected to Supabase.`
+Returns a status message including the server version, e.g. `✅ noteitdown MCP server v1.0.0 is healthy and connected to Supabase.`
 
 #### `batch_delete_notes`
 Delete multiple notes in a single operation.
@@ -210,7 +212,13 @@ Enable verbose debug output to troubleshoot the server:
 NOTEITDOWN_DEBUG=true noteitdown
 ```
 
-Debug logs are prefixed with `[noteitdown:debug]` and written to stderr.
+All log and debug messages include ISO 8601 timestamps, e.g.:
+```
+[2026-07-15T12:00:00.000Z] [noteitdown] Server started
+[2026-07-15T12:00:01.000Z] [noteitdown:debug] Listing notes: { limit: 50, offset: 0 }
+```
+
+Debug logs are prefixed with `[noteitdown:debug]`, regular logs with `[noteitdown]`, and written to stderr.
 
 ### Setup Command
 
@@ -219,10 +227,11 @@ noteitdown setup
 ```
 
 The setup wizard:
-1. Validates your Supabase URL and Anon Key
-2. Probes the connection and detects if the `notes` table exists
-3. Creates the table automatically (via direct Postgres connection or Supabase SQL API)
-4. Saves configuration to `~/.noteitdown/config.json`
+1. Validates your Supabase URL format (must be `https://*.supabase.co`)
+2. Validates your Anon Key format (checks length ≥ 30 characters and contains a dot separator)
+3. Probes the connection and detects if the `notes` table exists
+4. Creates the table automatically (via direct Postgres connection or Supabase SQL API)
+5. Saves configuration to `~/.noteitdown/config.json`
 
 ### Schema
 
@@ -272,6 +281,17 @@ create trigger noteitdown_updated_at
 ```
 
 </details>
+
+---
+
+### Rate Limiting
+
+The MCP server includes a built-in in-memory rate limiter to prevent abuse:
+
+- **100 requests per 60-second window** (configurable)
+- Applied across all tool handlers (`list_notes`, `get_note`, `create_note`, etc.)
+- Returns a descriptive error when the limit is exceeded
+- Per-operation and per-session rate limiting can be added by specifying different keys
 
 ---
 
