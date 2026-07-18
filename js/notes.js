@@ -17,11 +17,13 @@ function undo() {
         state.historyIndex--;
         const content = state.history[state.historyIndex];
         elements.editor.value = content;
+        elements.editor.selectionStart = elements.editor.selectionEnd = content.length;
         if (state.activeNoteId && state.notes[state.activeNoteId]) {
             state.notes[state.activeNoteId].content = content;
         }
         renderPreview(content);
         updateCharCount();
+        updateEditorGutter();
         saveState();
     }
 }
@@ -31,11 +33,13 @@ function redo() {
         state.historyIndex++;
         const content = state.history[state.historyIndex];
         elements.editor.value = content;
+        elements.editor.selectionStart = elements.editor.selectionEnd = content.length;
         if (state.activeNoteId && state.notes[state.activeNoteId]) {
             state.notes[state.activeNoteId].content = content;
         }
         renderPreview(content);
         updateCharCount();
+        updateEditorGutter();
         saveState();
     }
 }
@@ -60,6 +64,7 @@ function createNewNote() {
     addToHistory('');
 
     if (state.isSyncEnabled) syncNoteToSupabase(id);
+    if (state.isLocalMode) syncNoteToLocalApi(id);
 }
 
 function deleteNote(id, event) {
@@ -72,6 +77,7 @@ function deleteNote(id, event) {
     delete state.notes[id];
 
     if (state.isSyncEnabled) deleteNoteFromSupabase(id);
+    if (state.isLocalMode) deleteNoteFromLocalApi(id);
 
     const noteIds = Object.keys(state.notes);
     if (noteIds.length > 0) {
@@ -110,6 +116,7 @@ function loadActiveNote() {
         elements.preview.innerHTML = '';
     }
     updateCharCount();
+    updateEditorGutter();
 }
 
 function handleEditorInput() {
@@ -122,8 +129,17 @@ function handleEditorInput() {
 
     renderPreview(content);
     updateCharCount();
+    updateEditorGutter();
+
+    // Record history (debounced so a burst of typing is a single undo step)
+    clearTimeout(historyTimeout);
+    historyTimeout = setTimeout(() => {
+        addToHistory(content);
+    }, 400);
 
     clearTimeout(saveTimeout);
+    clearTimeout(localApiSaveTimeout);
+
     saveTimeout = setTimeout(() => {
         saveState();
         renderNotesList();
@@ -132,6 +148,12 @@ function handleEditorInput() {
 
         if (state.isSyncEnabled && state.activeNoteId) {
             syncNoteToSupabase(state.activeNoteId);
+        }
+
+        if (state.isLocalMode && state.activeNoteId) {
+            localApiSaveTimeout = setTimeout(() => {
+                syncNoteToLocalApi(state.activeNoteId);
+            }, 200);
         }
     }, 800);
 }
@@ -170,7 +192,7 @@ function handleEditorKeydown(e) {
         handleToolbarAction('italic');
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+    if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'n' || e.key === 'N')) {
         e.preventDefault();
         createNewNote();
     }
@@ -182,7 +204,19 @@ function toggleSidebar() {
 
 function handleSearch(e) {
     state.searchQuery = e.target.value.toLowerCase();
-    renderNotesList();
+
+    // Debounce to avoid firing on every keystroke
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        if (state.isLocalMode) {
+            // Local mode: server-side full-text search via the API
+            loadFromLocalApi(state.searchQuery || undefined);
+        } else {
+            // Other modes: client-side filtering on already-loaded notes
+            renderNotesList();
+        }
+    }, 250);
 }
 
 function renderNotesList() {

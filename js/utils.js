@@ -32,8 +32,17 @@ function normalizeNote(note) {
 }
 
 function deriveTitle(note) {
-    if (note.title && note.title.trim()) return note.title.trim();
-    const first = (note.content || '').split('\n').find(l => l.trim());
+    const lines = (note.content || '').split('\n');
+    // Look for the first markdown heading (e.g. "# Header", "## Subheader")
+    for (const line of lines) {
+        const trimmed = line.trim();
+        const match = trimmed.match(/^#{1,6}\s+(.+)/);
+        if (match) {
+            return match[1].trim().slice(0, 80);
+        }
+    }
+    // Fall back to the first non-empty line
+    const first = lines.find(l => l.trim());
     return first ? first.trim().slice(0, 80) : 'Untitled note';
 }
 

@@ -6,18 +6,36 @@ function init() {
         mangle: false
     });
 
+    detectLocalMode();
+
     loadState();
-    loadSupabaseConfig();
+
+    if (state.isLocalMode) {
+        // Local mode: load notes from the API, fall back to localStorage
+        showLocalModeUI();
+        loadFromLocalApi().then(() => {
+            loadSupabaseConfig();
+        });
+    } else {
+        // Cloud / standalone mode: load from Supabase if configured
+        loadSupabaseConfig();
+    }
+
     loadAIConfig();
+    loadSyncConfig();
     applyTheme();
 
-    renderNotesList();
-    loadActiveNote();
+    if (!state.isLocalMode) {
+        renderNotesList();
+        loadActiveNote();
+    }
+
     updateCharCount();
+    updateEditorGutter();
     setupEventListeners();
     fetchLatestVersion();
 
-    updateStatus('Ready', 'info');
+    updateStatus(state.isLocalMode ? 'Local mode — SQLite' : 'Ready', 'info');
 }
 
 function loadState() {
@@ -66,10 +84,29 @@ function saveState() {
     }
 }
 
+// ─── Local Mode UI ───────────────────────────────────────────────────────────
+
+function showLocalModeUI() {
+    // Show the existing local mode badge (remove hidden class)
+    const badge = document.getElementById('localModeBadge');
+    if (badge) {
+        badge.classList.remove('hidden');
+    }
+
+    // Update about section to show local mode
+    const aboutMode = document.getElementById('aboutMode');
+    if (aboutMode) {
+        aboutMode.textContent = 'Running with local SQLite database on port 3721';
+    }
+}
+
 function setupEventListeners() {
     // Editor
     elements.editor.addEventListener('input', handleEditorInput);
     elements.editor.addEventListener('keydown', handleEditorKeydown);
+    elements.editor.addEventListener('scroll', () => {
+        elements.editorGutter.scrollTop = elements.editor.scrollTop;
+    });
 
     // Buttons
     elements.newNoteBtn.addEventListener('click', createNewNote);
@@ -82,7 +119,14 @@ function setupEventListeners() {
     elements.clearSyncBtn.addEventListener('click', clearSync);
     elements.darkModeToggle.addEventListener('click', toggleDarkMode);
     elements.copyPreviewBtn.addEventListener('click', copyPreviewHTML);
-    elements.rawToggleBtn.addEventListener('click', toggleRawMode);
+
+    // Sync interval range slider — auto-save on drag
+    if (elements.syncInterval) {
+        elements.syncInterval.addEventListener('input', () => {
+            updateSyncIntervalDisplay();
+            saveSyncConfig();
+        });
+    }
 
     // AI Chat
     elements.aiChatToggleBtn.addEventListener('click', toggleAiChat);

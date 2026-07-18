@@ -2,6 +2,7 @@
 const elements = {
     app: document.getElementById('app'),
     editor: document.getElementById('editor'),
+    editorGutter: document.getElementById('editorGutter'),
     preview: document.getElementById('preview'),
     previewSection: document.querySelector('.preview-section'),
     notesList: document.getElementById('notesList'),
@@ -25,13 +26,14 @@ const elements = {
     saveBtn: document.getElementById('saveBtn'),
     darkModeToggle: document.getElementById('darkModeToggle'),
     copyPreviewBtn: document.getElementById('copyPreviewBtn'),
-    rawToggleBtn: document.getElementById('rawToggleBtn'),
     aiChatToggleBtn: document.getElementById('aiChatToggleBtn'),
     aiChatPanel: document.getElementById('aiChatPanel'),
     aiChatMessages: document.getElementById('aiChatMessages'),
     aiChatInput: document.getElementById('aiChatInput'),
     aiSendBtn: document.getElementById('aiSendBtn'),
     closeAiChatBtn: document.getElementById('closeAiChatBtn'),
+    syncInterval: document.getElementById('syncInterval'),
+    syncIntervalValue: document.getElementById('syncIntervalValue'),
     aiEnableToggle: document.getElementById('aiEnableToggle'),
     aiEndpoint: document.getElementById('aiEndpoint'),
     aiApiKey: document.getElementById('aiApiKey'),
@@ -50,13 +52,27 @@ let state = {
     supabaseClient: null,
     isSyncEnabled: false,
     isDarkMode: false,
-    isRawMode: false,
     isAiEnabled: false,
     isAiChatOpen: false,
     searchQuery: '',
     history: [],
     historyIndex: -1,
-    maxHistory: 50
+    maxHistory: 50,
+    isLocalMode: false
 };
 
 let saveTimeout = null;
+let localApiSaveTimeout = null;
+let searchTimeout = null;
+let historyTimeout = null;
+
+// Auto-detect local mode: served from NoteItDown local server on port 3721
+function detectLocalMode() {
+    if (window.NOTEITDOWN_LOCAL_MODE) {
+        state.isLocalMode = true;
+    } else {
+        const isLocalHost = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]', '::1'].includes(window.location.hostname);
+        state.isLocalMode = isLocalHost && window.location.port === '3721';
+    }
+    return state.isLocalMode;
+}

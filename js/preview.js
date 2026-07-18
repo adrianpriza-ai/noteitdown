@@ -1,29 +1,26 @@
 function renderPreview(markdown) {
-    if (state.isRawMode) {
-        elements.preview.innerHTML = `<pre>${escapeHtml(markdown || '')}</pre>`;
-        elements.preview.classList.add('raw-mode');
-    } else {
-        elements.preview.classList.remove('raw-mode');
-        try {
-            elements.preview.innerHTML = marked.parse(markdown || '');
-        } catch (e) {
-            elements.preview.innerHTML = '<p style="color: red;">Error rendering markdown</p>';
-        }
-    }
-}
-
-function toggleRawMode() {
-    state.isRawMode = !state.isRawMode;
-    elements.rawToggleBtn.classList.toggle('active', state.isRawMode);
-
-    if (state.activeNoteId && state.notes[state.activeNoteId]) {
-        renderPreview(state.notes[state.activeNoteId].content);
+    try {
+        elements.preview.innerHTML = marked.parse(markdown || '');
+    } catch (e) {
+        elements.preview.innerHTML = '<p style="color: red;">Error rendering markdown</p>';
     }
 }
 
 function updateCharCount() {
     const count = elements.editor.value.length;
     elements.charCount.textContent = `${count} character${count !== 1 ? 's' : ''}`;
+}
+
+function updateEditorGutter() {
+    const lines = elements.editor.value.split('\n').length;
+    const current = elements.editorGutter.childElementCount;
+    if (lines === current) return;
+
+    let html = '';
+    for (let i = 1; i <= lines; i++) {
+        html += `<div>${i}</div>`;
+    }
+    elements.editorGutter.innerHTML = html;
 }
 
 function copyPreviewHTML() {

@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFA500' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F37021' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Note It Down</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/ai-chat.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
     <div class="app" id="app">
@@ -27,9 +32,17 @@
                     </svg>
                     Note It Down
                 </h1>
+                <span id="localModeBadge" class="local-mode-badge hidden" title="Running with local SQLite database">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    Local
+                </span>
             </div>
             <div class="header-right">
-                <button id="newNoteBtn" class="btn btn-primary" title="New Note">
+                    <button id="newNoteBtn" class="btn btn-primary" title="New Note (Ctrl+Alt+N)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>New</span>
                 </button>
@@ -118,7 +131,10 @@
                             </button>
                         </div>
                     </div>
-                    <textarea id="editor" class="editor" placeholder="Start typing your note in Markdown..."></textarea>
+                    <div class="editor-wrapper">
+                        <div id="editorGutter" class="editor-gutter" aria-hidden="true"></div>
+                        <textarea id="editor" class="editor" placeholder="Start typing your note in Markdown..."></textarea>
+                    </div>
                 </div>
                 
                 <div class="preview-section" data-panel="preview">
@@ -127,9 +143,6 @@
                         <div class="preview-actions">
                             <button class="btn btn-sm hidden" id="aiChatToggleBtn" title="Toggle AI Chat">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            </button>
-                            <button class="btn btn-sm" id="rawToggleBtn" title="Toggle Raw Markdown">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                             </button>
                             <button class="btn btn-sm" id="copyPreviewBtn" title="Copy HTML">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -226,7 +239,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="settings-section">
+                <div class="settings-section" id="supabaseSection">
                     <h3>Supabase Sync</h3>
                     <div class="form-group">
                         <label for="supabaseUrl">Project URL</label>
@@ -236,7 +249,34 @@
                         <label for="anonKey">Anon Key</label>
                         <input type="password" id="anonKey" placeholder="your-anon-key">
                     </div>
+                    <div class="form-group">
+                        <label for="syncInterval">Sync interval (seconds)</label>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <input type="range" id="syncInterval" min="0" max="30" step="1" value="2" style="flex:1;">
+                            <span id="syncIntervalValue" style="min-width:32px;text-align:center;font-weight:600;color:var(--text-primary);font-size:0.9rem;">2s</span>
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Minimum time between sync API calls (0 = no limit)</div>
+                    </div>
                     <div id="connectionMessage" class="message"></div>
+                    <details class="sql-setup-guide">
+                        <summary>Need to create the <code>notes</code> table?</summary>
+                        <p style="margin:8px 0 4px;font-size:12px;color:var(--text-muted)">Run this SQL in your Supabase project's SQL Editor:</p>
+                        <pre style="font-size:11px;background:var(--bg-tertiary);padding:10px;border-radius:6px;overflow:auto;white-space:pre">create table notes (
+  id uuid primary key default gen_random_uuid(),
+  title text,
+  content text,
+  tags text[] default '{}',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Enable Row Level Security
+alter table notes enable row level security;
+
+-- Allow all operations for anon key
+create policy "allow all" on notes
+  for all using (true) with check (true);</pre>
+                    </details>
                     <div class="form-actions">
                         <button id="testBtn" class="btn btn-secondary">Test Connection</button>
                         <button id="clearSyncBtn" class="btn btn-outline">Clear Sync</button>
@@ -268,7 +308,9 @@
                 </div>
                 <div class="settings-section">
                     <h3>About</h3>
-                    <p class="about-text">Note It Down <span id="appVersion">v1.0.1</span><br>A simple, offline-first note taking app</p>
+                    <p class="about-text">Note It Down <span id="appVersion">v1.0.2</span><br>
+                        <span id="aboutMode">A simple, offline-first note taking app</span>
+                    </p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -280,6 +322,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/notes.js"></script>
     <script src="js/preview.js"></script>
     <script src="js/settings.js"></script>

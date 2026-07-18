@@ -42,7 +42,6 @@ CREATE TRIGGER noteitdown_updated_at
 
 export type CreateTableResult =
   | { ok: true; method: "pg"; message: string }
-  | { ok: true; method: "sql-api"; message: string }
   | { ok: false; method: "manual"; message: string; sql: string };
 
 function deriveProjectRef(supabaseUrl: string): string {
@@ -99,37 +98,13 @@ export async function createNotesTable(
     }
   }
 
-  // Fall back to the Supabase SQL endpoint (works on projects that allow it).
-  try {
-    const res = await fetch(`${supabaseUrl.replace(/\/$/, "")}/sql`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ query: NOTES_TABLE_SQL }),
-    });
-    if (res.ok) {
-      return {
-        ok: true,
-        method: "sql-api",
-        message: "Created the `notes` table via the Supabase SQL endpoint.",
-      };
-    }
-    const body = await res.text().catch(() => "");
-    return {
-      ok: false,
-      method: "manual",
-      message: `SQL endpoint returned ${res.status}. ${body}`.trim(),
-      sql: NOTES_TABLE_SQL,
-    };
-  } catch (err) {
-    return {
-      ok: false,
-      method: "manual",
-      message: `Could not reach the SQL endpoint: ${(err as Error).message}`,
-      sql: NOTES_TABLE_SQL,
-    };
-  }
+  // Supabase does not expose a public SQL execution endpoint on the anon key.
+  // The Management API (/v1/projects/{ref}/database/query) requires a service-role
+  // or personal access token — not available here. Fall through to manual.
+  return {
+    ok: false,
+    method: "manual",
+    message: "No database password provided. Please create the table manually using the SQL below.",
+    sql: NOTES_TABLE_SQL,
+  };
 }
